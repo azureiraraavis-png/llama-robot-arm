@@ -117,7 +117,7 @@ py -3.12 voice_arm.py                     # 음성
 QLoRA 어댑터 (rank 16, 41.9M 학습 파라미터 / 8.07B, 데이터 98건)는 용량 때문에
 저장소에 넣지 않았습니다. Hugging Face Hub에 별도로 올려 두었습니다.
 
-> **모델:** *(여기에 Hugging Face 주소를 넣으세요)*
+> **모델:** *https://huggingface.co/azureiraraavis/Llama-3.1-8B-arm-lora*
 
 **Built with Llama** — 이 어댑터는 Meta Llama 3.1 8B Instruct를 파인튜닝한 파생물이며,
 [Llama 3.1 Community License](https://www.llama.com/llama3_1/license/)를 따릅니다.
