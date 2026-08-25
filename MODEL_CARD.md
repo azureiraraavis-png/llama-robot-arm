@@ -42,7 +42,7 @@ Ollama 판은 규칙과 예시가 든 긴 시스템 프롬프트를 쓰지만, �
 
 이 어댑터만으로는 팔이 움직이지 않습니다. 명령을 검증하고 시리얼로 보내는 브리지가 필요합니다.
 
-> 코드·펌웨어·데이터셋: *https://github.com/<GitHub아이디>/llama-robot-arm*
+> 코드·펌웨어·데이터셋: *https://github.com/azureiraraavis-png/llama-robot-arm*
 
 ## 한계
 
