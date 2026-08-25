@@ -1,0 +1,34 @@
+# 학습된 모델 — git에 넣지 않습니다 (Hugging Face Hub에 별도 공개)
+# git은 지운 파일의 모든 판을 영원히 보관하므로, 한 번 커밋하면 저장소가 계속 무겁습니다.
+arm-lora/
+arm-lora-*/
+*/checkpoint-*/
+*.safetensors
+*.pt
+*.pth
+*.bin
+
+# 자동으로 내려받는 것 — 저장소에 둘 이유가 없습니다
+# hand_track.py 가 처음 실행할 때 알아서 받습니다 (약 8MB)
+hand_landmarker.task
+
+# 녹음·촬영 찌꺼기
+*.wav
+*.mp4
+*.avi
+snapshot_*.png
+frame_*.png
+
+# 파이썬
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# 편집기·운영체제
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
