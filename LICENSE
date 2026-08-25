@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 <여기에 본인 이름 또는 GitHub 아이디를 넣으세요>
+Copyright (c) 2026 <?�기??본인 ?�름 ?�는 GitHub ?�이?��? ?�으?�요>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,7 @@ SOFTWARE.
 
 ---
 
-이 저장소의 코드와 문서에는 위 MIT 라이선스가 적용됩니다.
+???�?�소??코드?� 문서?�는 ??MIT ?�이?�스가 ?�용?�니??
 
-별도로 Hugging Face Hub에 공개한 QLoRA 어댑터는 Meta Llama 3.1 8B Instruct의
-파생물이므로 Llama 3.1 Community License를 따릅니다. MIT가 아닙니다.
+별도�?Hugging Face Hub??공개??QLoRA ?�댑?�는 Meta Llama 3.1 8B Instruct???�생물이므�?Llama 3.1 Community License�??�릅?�다. MIT가 ?�닙?�다.
   https://www.llama.com/llama3_1/license/
