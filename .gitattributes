@@ -1,0 +1,35 @@
+# 줄바꿈 규칙을 저장소가 직접 정합니다.
+# 이렇게 두면 각 컴퓨터의 git 설정(core.autocrlf)이 무엇이든 결과가 같습니다.
+# 다른 컴퓨터에서 클론했을 때 "줄바꿈만 다른데 파일 전체가 바뀐 것처럼" 보이는 일을 막습니다.
+
+# 기본: 텍스트는 저장소에 LF로 넣고, 꺼낼 때는 그 운영체제에 맞게
+* text=auto
+
+# 텍스트로 다룰 것들 (명시해 두면 판단이 흔들리지 않습니다)
+*.py     text
+*.md     text
+*.txt    text
+*.json   text
+*.jsonl  text
+*.html   text
+*.css    text
+*.js     text
+*.ino    text
+*.h      text
+*.ps1    text eol=crlf
+
+# 이진 파일 — git이 줄바꿈을 손대면 파일이 깨집니다
+*.pptx           binary
+*.pdf            binary
+*.png            binary
+*.jpg            binary
+*.jpeg           binary
+*.gif            binary
+*.wav            binary
+*.mp4            binary
+*.task           binary
+*.safetensors    binary
+*.bin            binary
+
+# 학습 데이터는 줄 단위라 diff가 잘 보이는 편이 낫습니다
+*.jsonl  text diff
