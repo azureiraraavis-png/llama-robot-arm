@@ -57,6 +57,13 @@ SYSTEM_PROMPT = """당신은 5축 로봇팔 제어기입니다. 사용자의 자
   {"cmd":"speed","level":5}                       속도 1(느림)~10(빠름)
   {"cmd":"repeat","seconds":5,"commands":[...]}   안의 명령들을 n초 동안 반복 (반복 횟수 계산은 시스템이 함)
   {"cmd":"repeat","times":5,"commands":[...]}     안의 명령들을 n번 반복 (횟수 세기는 시스템이 함)
+  {"cmd":"look_at","target":"빨간 물체"}           카메라로 그 색 물체를 찾아 그쪽으로 몸을 돌린다.
+                                                  target에는 색 이름만 넣어라(빨강 주황 노랑 초록
+                                                  하늘 파랑 보라 분홍). 색을 말하지 않았으면
+                                                  "보이는 것"으로 두면 저장된 색을 쓴다.
+                                                  ★ 화면에서 찾고 각도를 계산하는 일은 시스템이 한다.
+                                                  각도를 네가 추측해서 joint로 내지 마라.
+  {"cmd":"track","target":"파란 물체","seconds":10} n초 동안 그 물체를 따라 본다
   {"cmd":"dance","routine":"wave"}                미리 짜둔 안무를 춘다. routine은 아래 중 하나:
       all(전곡) bow(인사) wave(웨이브) sway(좌우스윙) shake(도리도리)
       clap(집게박수) robot(로봇춤) sweep(큰스윕) finale(피날레)
@@ -69,6 +76,11 @@ SYSTEM_PROMPT = """당신은 5축 로봇팔 제어기입니다. 사용자의 자
 4. "잡다/집다/쥐다/줍다"가 들어간 지시(시늉·흉내 포함)는 반드시 이 5단계 전체를 순서대로 포함한다:
    그리퍼 열기 → 앞으로 숙여 접근(어깨/팔꿈치) → 그리퍼 닫기 → 잠시 대기 → 들어올리기.
    grip 명령 하나만 출력하는 것은 오답이다.
+4-1. "보이는 것/물체 쪽을 봐", "빨간 것을 봐", "저기 봐"처럼 **카메라로 보고 향하라는 지시**는
+   반드시 look_at을 쓴다. 베이스 각도를 추측해서 joint로 내는 것은 오답이다 —
+   화면의 어디에 있는지는 네가 알 수 없고, 시스템이 실제로 본다.
+   "계속 따라봐/쫓아봐"처럼 지속을 뜻하면 track을 쓴다.
+   look_at 뒤에는 home을 붙이지 않는다 (붙이면 방금 돌아본 방향이 즉시 사라진다).
 5. 각도는 반드시 각 관절의 허용 범위 안에서.
 6. 동작이 끝나면 특별한 이유가 없는 한 {"cmd":"home"}으로 마무리한다.
    단, "~한 채로", "~인 상태로 있어", "그대로 유지해"처럼 자세를 유지하라는 지시는 home으로 끝내지 않는다.
@@ -251,6 +263,13 @@ def validate(commands: list, allow_repeat: bool = True) -> list:
             else:  # 시간 반복: 전송 단계에서 실제 시계로 반복
                 secs = max(1, min(30, int(c.get("seconds", 5))))
                 lines.append({"repeat_s": secs, "lines": sub})
+        elif cmd == "look_at":
+            # 화면에서 찾는 일은 전송 단계에서 한다 (move가 GET으로 현재 각도를 묻는 것과 같은 자리)
+            lines.append({"look_at": {"target": c.get("target"),
+                                      "frames": int(c.get("frames", 5))}})
+        elif cmd == "track":
+            secs = max(1, min(60, int(c.get("seconds", 10))))
+            lines.append({"track": {"target": c.get("target"), "seconds": secs}})
         elif cmd == "dance":
             # 모델은 "어떤 춤"만 말하고, 안무·박자·속도 계산은 dance.py가 한다
             # (repeat의 횟수 세기, wait의 초 환산과 같은 구조)
@@ -330,6 +349,8 @@ WAIT_VERB_RE = re.compile(r"(기다리|기다려|대기|가만히\s*있)")
 HOLD_STRONG_RE = re.compile(r"(유지|멈추|멈춰|계속)")
 # "그대로/그 상태로/그 자세로" — 단독이면 유지, 시간+대기동사와 함께면 그 시간만
 HOLD_SOFT_RE = re.compile(r"(그대로|그\s*상태|그\s*자세|그\s*자리|이\s*상태|이\s*자세)")
+# "봐/보라/향해/가리켜" — 돌아본 방향을 유지해야 하므로 home으로 끝내지 않는다
+LOOK_RE = re.compile(r"(쪽을\s*봐|쪽을\s*보|쪽으로\s*봐|바라봐|바라보|향해|향하|가리켜|가리키|따라\s*봐|쫓아)")
 NO_RETURN_RE = re.compile(r"(원상복구|원상복귀|복구)\s*하지\s*(마|말)")
 RETURN_RE = re.compile(r"(원상복구|원상복귀|원래\s*상태로\s*돌아|원위치로\s*되돌)")
 
@@ -351,6 +372,8 @@ def home_policy(instruction: str):
     i = instruction
     if NO_RETURN_RE.search(i):
         return False
+    if LOOK_RE.search(i):
+        return False                 # 보라는 지시 — 돌아본 방향을 유지한다
     if RETURN_RE.search(i):
         return True
     if HOLD_STRONG_RE.search(i):
@@ -509,6 +532,12 @@ def query_pose(ser):
 
 def _exec(ser, item) -> bool:
     """명령 하나 실행. 상대 이동이면 현재 각도를 조회해 목표각을 계산한다."""
+    if isinstance(item, dict) and "look_at" in item:
+        import look_at
+        return look_at.execute_look(lambda l: _send_one(ser, l), item["look_at"])
+    if isinstance(item, dict) and "track" in item:
+        import look_at
+        return look_at.execute_track(lambda l: _send_one(ser, l), item["track"])
     if isinstance(item, dict) and "rel_joint" in item:
         pose = query_pose(ser)
         if pose is None:
