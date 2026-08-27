@@ -1,0 +1,705 @@
+<title>로봇팔 명령 카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Song+Myung&display=swap">
+
+<style>
+  :root {
+    --ink:      #1B1D23;
+    --ink-soft: #4A4E58;
+    --ink-mute: #767B85;
+    --paper:    #FCFCFB;
+    --surface:  #F1F2EF;
+    --surface2: #E7E9E4;
+    --rule:     #DCDED8;
+    --amber:    #A9530F;
+    --amber-bg: #F6EADE;
+    --teal:     #2C6558;
+    --teal-bg:  #E2EDE9;
+    --alert:    #9C2F28;
+    --alert-bg: #F7E4E2;
+    --shadow:   0 1px 2px rgba(27,29,35,.06), 0 6px 16px rgba(27,29,35,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink:      #E9EAE6;
+      --ink-soft: #B4B8B0;
+      --ink-mute: #868B84;
+      --paper:    #15171B;
+      --surface:  #1D2026;
+      --surface2: #262A31;
+      --rule:     #333841;
+      --amber:    #E2913F;
+      --amber-bg: #2C2118;
+      --teal:     #71B9A5;
+      --teal-bg:  #16241F;
+      --alert:    #E07B72;
+      --alert-bg: #2A1917;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink:      #E9EAE6;
+    --ink-soft: #B4B8B0;
+    --ink-mute: #868B84;
+    --paper:    #15171B;
+    --surface:  #1D2026;
+    --surface2: #262A31;
+    --rule:     #333841;
+    --amber:    #E2913F;
+    --amber-bg: #2C2118;
+    --teal:     #71B9A5;
+    --teal-bg:  #16241F;
+    --alert:    #E07B72;
+    --alert-bg: #2A1917;
+    --shadow:   0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans KR", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 24px 96px; }
+
+  /* ── 머리 ─────────────────────────────────────── */
+  header { margin-bottom: 40px; }
+  h1 {
+    font-family: "Song Myung", "IBM Plex Sans KR", serif;
+    font-size: clamp(30px, 5vw, 42px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 10px;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+  }
+  .sub { color: var(--ink-soft); margin: 0 0 4px; max-width: 62ch; }
+  .prefix {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .prefix b { color: var(--amber); font-weight: 600; }
+
+  /* ── 비상 ─────────────────────────────────────── */
+  .panic {
+    display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center;
+    margin: 24px 0 0; padding: 16px 20px;
+    background: var(--alert-bg);
+    border: 1px solid color-mix(in srgb, var(--alert) 26%, transparent);
+    border-radius: 8px;
+  }
+  .panic .lab {
+    font-size: 12px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--alert); white-space: nowrap;
+  }
+  .panic .item { display: flex; align-items: baseline; gap: 10px; }
+  .panic code { background: transparent; color: var(--alert); font-weight: 600; padding: 0; }
+  .panic span { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ── 구역 ─────────────────────────────────────── */
+  section { margin-top: 52px; }
+  h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--amber);
+    margin: 0 0 6px;
+  }
+  .lede { color: var(--ink-soft); margin: 0 0 20px; max-width: 66ch; font-size: 14.5px; }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-size: 15px; font-weight: 700; margin: 0 0 3px; color: var(--ink);
+  }
+  .card .note { font-size: 13px; color: var(--ink-mute); margin: 0 0 14px; }
+
+  /* ── 코드 ─────────────────────────────────────── */
+  code, kbd {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .89em;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-variant-ligatures: none;
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 13px; line-height: 1.75;
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 0 0 12px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .cm { color: var(--ink-mute); }
+  kbd {
+    border: 1px solid var(--rule);
+    box-shadow: 0 1px 0 var(--rule);
+    font-size: 12px; font-weight: 500;
+  }
+
+  /* ── 말로 하는 명령 ────────────────────────────── */
+  .says { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+  .says li { display: grid; gap: 2px; }
+  .says q {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13.5px; color: var(--ink); quotes: "「" "」";
+  }
+  .says em { font-style: normal; font-size: 12.5px; color: var(--ink-mute); }
+
+  /* ── 표 ───────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; background: var(--surface); }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-mute); background: var(--surface2);
+  }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { white-space: nowrap; }
+  td code { font-size: 12.5px; background: none; padding: 0; color: var(--amber); font-weight: 500; }
+  td .desc { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ── 칩 ───────────────────────────────────────── */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
+  .chips li {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    background: var(--surface2);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 3px 11px;
+  }
+  .chips li b { font-weight: 600; color: var(--amber); font-family: "IBM Plex Sans KR", sans-serif; }
+
+  .keys { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+  .keys li { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; }
+  .keys kbd { flex: none; min-width: 58px; text-align: center; }
+  .keys span { color: var(--ink-soft); }
+
+  .ok { color: var(--teal); font-weight: 600; }
+  .warn { color: var(--amber); font-weight: 600; }
+
+  .callout {
+    background: var(--teal-bg);
+    border: 1px solid color-mix(in srgb, var(--teal) 24%, transparent);
+    border-radius: 8px; padding: 14px 18px;
+    font-size: 13.5px; color: var(--ink-soft);
+  }
+  .callout b { color: var(--teal); }
+
+  nav.toc {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 22px 0 0; padding: 0; list-style: none;
+  }
+  nav.toc a {
+    font-size: 12.5px; text-decoration: none;
+    color: var(--ink-soft);
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 4px 13px;
+    transition: border-color .15s, color .15s;
+  }
+  nav.toc a:hover { color: var(--amber); border-color: var(--amber); }
+
+  .steps { list-style: none; counter-reset: st; margin: 0; padding: 0; display: grid; gap: 18px; }
+  .steps > li { counter-increment: st; display: grid; grid-template-columns: 30px 1fr; gap: 14px; }
+  .steps > li::before {
+    content: counter(st);
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600;
+    color: var(--amber); background: var(--amber-bg);
+    width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; margin-top: 2px;
+  }
+  .steps h3 { font-size: 15px; font-weight: 700; margin: 3px 0 6px; }
+  .steps p { margin: 0 0 9px; font-size: 13.5px; color: var(--ink-soft); }
+  .steps pre { margin-bottom: 8px; }
+
+  footer {
+    margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-size: 13px; color: var(--ink-mute);
+  }
+  footer a { color: var(--amber); }
+  a:focus-visible, code:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header>
+  <h1>로봇팔 명령 카드</h1>
+  <p class="sub">Adeept 5축 아두이노 팔 · 자연어 · 손짓 · 음성. 지금 쓸 수 있는 것 전부.</p>
+  <p class="prefix">모든 파이썬 명령 앞에 <b>py -3.12</b> 를 붙입니다 &nbsp;·&nbsp; 기본 포트 COM4</p>
+
+  <div class="panic">
+    <span class="lab">비상</span>
+    <span class="item"><code>stop</code> <span>언어모델을 거치지 않고 즉시 홈으로</span></span>
+    <span class="item"><kbd>Ctrl</kbd>+<kbd>C</kbd> <span>프로그램 중단</span></span>
+    <span class="item"><span>위험하면 손으로 잡지 말고 <b>USB를 뽑으세요</b></span></span>
+  </div>
+  <nav class="toc">
+    <a href="#shell">창 열기</a>
+    <a href="#say">말로 하는 명령</a>
+    <a href="#run">프로그램</a>
+    <a href="#console">콘솔 안에서</a>
+    <a href="#check">점검과 보정</a>
+    <a href="#env">환경과 배포</a>
+    <a href="#demo">시연 직전</a>
+    <a href="#trouble">막혔을 때</a>
+  </nav>
+</header>
+
+<!-- ══════════ 창 열기 ══════════ -->
+<section id="shell">
+  <h2>창 열기 — 여기서부터</h2>
+  <p class="lede">
+    아래 모든 명령은 <b>PowerShell 창</b>에서 칩니다. 그리고 <b>창이 두 개</b> 필요합니다 —
+    하나는 라마를 띄워 두는 용도, 하나는 실제로 명령을 치는 용도입니다.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <div>
+        <h3>작업 폴더에서 창 열기</h3>
+        <p>탐색기로 폴더에 들어간 뒤 <b>주소창에 <code>powershell</code> 을 치고 Enter</b>.
+           그 폴더에서 바로 열립니다. <kbd>Shift</kbd>+우클릭 → “여기에 PowerShell 창 열기” 도 같습니다.</p>
+        <pre><code><span class="cm"># 이미 열린 창에서 옮겨갈 때</span>
+cd D:\workspace_raraavis\arduino_project00
+
+<span class="cm"># 지금 어디인지 · 무슨 파일이 있는지</span>
+pwd
+ls</code></pre>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <h3>첫 번째 창 — 라마를 띄워 둡니다</h3>
+        <p>이 창은 그대로 두세요. 닫으면 팔이 말을 못 알아듣습니다.</p>
+        <pre><code>ollama serve
+
+<span class="cm"># 새 창을 열어서 모델이 있는지 확인</span>
+ollama list        <span class="cm">llama3.1:8b 가 보여야 합니다</span></code></pre>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <h3>두 번째 창 — 여기서 명령을 칩니다</h3>
+        <p>1번처럼 작업 폴더에서 새 창을 하나 더 엽니다. 파이썬이 맞는지 먼저 확인하세요.</p>
+        <pre><code>py -0              <span class="cm">설치된 파이썬 목록</span>
+py -3.12 -V        <span class="cm">3.12.x 가 나와야 합니다</span></code></pre>
+        <p><code>python</code> 이 아니라 <b><code>py -3.12</code></b> 로 실행해야 합니다.
+           <code>python</code> 은 3.14로 가고, 거기엔 torch가 없습니다.</p>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <h3>포트 번호 확인</h3>
+        <p>USB를 다른 자리에 꽂으면 번호가 바뀝니다. 기본값은 COM4이고, 다르면 <code>--port</code> 로 알려줍니다.</p>
+        <pre><code>[System.IO.Ports.SerialPort]::GetPortNames()</code></pre>
+      </div>
+    </li>
+
+    <li>
+      <div>
+        <h3>실행</h3>
+        <pre><code>py -3.12 checkup.py --deep          <span class="cm">먼저 온전한지</span>
+py -3.12 llm_arm_bridge.py --port COM4</code></pre>
+        <p>가상환경(<code>.venv</code>)을 만드셨다면
+           <code>py -3.12</code> 대신 <code>.venv\Scripts\python</code> 을 씁니다.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="grid g2" style="margin-top:20px">
+    <div class="card">
+      <h3>창에서 알아두면 편한 것</h3>
+      <ul class="keys">
+        <li><kbd>Tab</kbd><span>파일 이름 자동완성 — <code>py -3.12 ha</code> 까지 치고 Tab</span></li>
+        <li><kbd>↑</kbd><span>이전에 친 명령 다시 꺼내기</span></li>
+        <li><kbd>Ctrl</kbd>+<kbd>C</kbd><span>지금 도는 것 중단</span></li>
+        <li><kbd>우클릭</kbd><span>붙여넣기 (PowerShell에서는 이게 붙여넣기입니다)</span></li>
+        <li><kbd>Ctrl</kbd>+<kbd>휠</kbd><span>글꼴 크기 — 시연 전에 키워 두세요</span></li>
+        <li><kbd>cls</kbd><span>화면 지우기</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>한글이 깨져 보이면</h3>
+      <p class="note">옛 cmd 창에서 가끔 그렇습니다</p>
+      <pre style="margin:0"><code>chcp 65001</code></pre>
+      <p class="note" style="margin-top:10px">
+        PowerShell을 쓰시면 대개 문제없습니다. Windows Terminal이 있다면 그쪽이 더 낫습니다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 말로 하는 명령 ══════════ -->
+<section id="say">
+  <h2>말로 하는 명령</h2>
+  <p class="lede">
+    <code>llm_arm_bridge.py</code>, <code>arm_tuned.py</code>, <code>voice_arm.py</code> 에서
+    똑같이 통합니다. 세 입구 모두 같은 검증 계층을 지나므로, 여기 적힌 것은 어느 쪽에서든 됩니다.
+  </p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>기본 동작</h3>
+      <p class="note">속도와 방향을 함께 알아듣습니다</p>
+      <ul class="says">
+        <li><q>천천히 앞으로 숙여서 인사하시오</q></li>
+        <li><q>집게를 여시오</q> / <q>집게를 닫으시오</q></li>
+        <li><q>고개를 도리도리 흔들어라</q></li>
+        <li><q>작은 물체를 잡는 시늉을 하시오</q>
+            <em>열기 → 접근 → 닫기 → 대기 → 들어올리기 5단계</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>횟수 세기</h3>
+      <p class="note">횟수는 모델이 아니라 코드가 셉니다</p>
+      <ul class="says">
+        <li><q>집게를 세 번 딱딱거리시오</q></li>
+        <li><q>집게를 닫았다 여는 것을 10번 반복하시오</q></li>
+        <li><q>5초 동안 집게를 딱딱거리시오</q>
+            <em>횟수 대신 시간으로도 됩니다</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>시간과 유지</h3>
+      <p class="note">지시문의 초와 계획이 어긋나면 지시문 쪽으로 되돌립니다</p>
+      <ul class="says">
+        <li><q>그 자세로 10초 기다리세요</q>
+            <em>10초 뒤 홈으로 복귀</em></li>
+        <li><q>그 상태로 기다리세요</q>
+            <em>시간을 안 말하면 <span class="warn">홈으로 안 돌아갑니다</span></em></li>
+        <li><q>그대로 유지해</q> / <q>원래 상태로 돌아가시오</q></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>상대 이동</h3>
+      <p class="note">현재 각도를 팔에게 물어본 뒤 계산합니다</p>
+      <ul class="says">
+        <li><q>10도 앞으로 기울여</q></li>
+        <li><q>모든 관절을 -15도씩 굽히시오</q>
+            <em>마이너스 = 뒤를 향해</em></li>
+        <li><q>조금 더 올려</q>
+            <em>이런 지시엔 홈 복귀를 붙이지 않습니다</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>춤</h3>
+      <p class="note">안무는 코드가 갖고 있고, 모델은 이름만 말합니다</p>
+      <ul class="says">
+        <li><q>로봇춤을 추시오</q></li>
+        <li><q>30초 동안 웨이브를 하시오</q></li>
+        <li><q>인사하고 나서, 20초 동안 로봇춤을 추시오</q>
+            <em>두 동작과 시간을 한 문장에</em></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>보고 향하기 <span class="ok">신규</span></h3>
+      <p class="note">화면에서 찾고 각도를 내는 일은 코드가 합니다</p>
+      <ul class="says">
+        <li><q>파란 물체 쪽을 봐</q></li>
+        <li><q>빨간 것을 바라보시오</q></li>
+        <li><q>10초 동안 노란 물체를 따라 봐</q></li>
+        <li><q>보이는 것 쪽을 봐</q>
+            <em>색을 말하지 않으면 저장된 색을 씁니다</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h3>아는 안무</h3>
+      <p class="note">한국어 이름으로 말해도 됩니다</p>
+      <ul class="chips">
+        <li>bow <b>인사</b></li><li>wave <b>웨이브</b></li><li>sway <b>스윙</b></li>
+        <li>shake <b>도리도리</b></li><li>clap <b>박수</b></li><li>robot <b>로봇</b></li>
+        <li>sweep <b>스윕</b></li><li>finale <b>피날레</b></li><li>all <b>전체</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>아는 색</h3>
+      <p class="note">없는 색은 <code>vision_check.py</code> 로 직접 찍어 넣습니다</p>
+      <ul class="chips">
+        <li>빨강</li><li>주황</li><li>노랑</li><li>초록</li>
+        <li>하늘</li><li>파랑</li><li>보라</li><li>분홍</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 실행 ══════════ -->
+<section id="run">
+  <h2>팔을 움직이는 프로그램</h2>
+  <p class="lede">
+    처음 쓰는 것은 <code>--dry-run</code> 으로 먼저 확인하세요. 팔 없이 계획만 보여줍니다.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>실행</th><th>무엇을</th><th>자주 쓰는 옵션</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>llm_arm_bridge.py</code></td>
+          <td><span class="desc">자연어로 조종 (Ollama · llama3.1:8b)</span></td>
+          <td><span class="desc"><code>--port COM4</code> <code>--model</code> <code>--dry-run</code></span></td>
+        </tr>
+        <tr>
+          <td><code>arm_tuned.py</code></td>
+          <td><span class="desc">직접 구운 모델로 조종 (짧은 프롬프트)</span></td>
+          <td><span class="desc"><code>--no-guard</code> 보정 없이 원출력 보기 · <code>--dry-run</code></span></td>
+        </tr>
+        <tr>
+          <td><code>voice_arm.py</code></td>
+          <td><span class="desc">말로 조종 (Whisper)</span></td>
+          <td><span class="desc"><code>--go</code> 확인 없이 실행 · <code>--stt-model</code> · <code>--dry-run</code></span></td>
+        </tr>
+        <tr>
+          <td><code>hand_track.py</code></td>
+          <td><span class="desc">손을 따라 움직이기 (MediaPipe)</span></td>
+          <td><span class="desc"><code>--gentle</code> <code>--no-grip</code> <code>--invert</code> <code>--dry-run</code></span></td>
+        </tr>
+        <tr>
+          <td><code>point_at.py</code></td>
+          <td><span class="desc">물체를 계속 따라 보기</span></td>
+          <td><span class="desc"><code>--once</code> 한 번만 · <code>--deadband</code> <code>--dry-run</code></span></td>
+        </tr>
+        <tr>
+          <td><code>dance.py</code></td>
+          <td><span class="desc">안무만 바로 실행</span></td>
+          <td><span class="desc"><code>-r robot</code> <code>--bpm 140</code> <code>--amp 0.6</code> <code>--no-grip</code> <code>--list</code></span></td>
+        </tr>
+        <tr>
+          <td><code>test_arm.py</code></td>
+          <td><span class="desc">언어모델 없이 하드웨어만 확인</span></td>
+          <td><span class="desc">배선이 의심될 때 가장 먼저</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 콘솔 ══════════ -->
+<section id="console">
+  <h2>콘솔 안에서</h2>
+  <p class="lede"><code>llm_arm_bridge.py</code> 나 <code>arm_tuned.py</code> 를 띄운 상태에서 칠 수 있는 말들입니다.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>특수 입력</h3>
+      <p class="note">언어모델을 거치지 않습니다</p>
+      <ul class="keys">
+        <li><kbd>stop</kbd><span>즉시 홈으로 — 시연 중 가장 쓸 일이 많습니다</span></li>
+        <li><kbd>bad</kbd><span>직전 동작이 이상했음 → 마지막 기록 삭제</span></li>
+        <li><kbd>!명령</kbd><span>아두이노에 직접 전송 (아래 표)</span></li>
+        <li><kbd>quit</kbd><span>종료 (<code>exit</code>, <code>종료</code> 도 됩니다)</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>직접 명령 <code>!</code></h3>
+      <p class="note">보정·디버깅용. 각도 한계는 펌웨어가 여전히 강제합니다</p>
+      <pre><code>!S 0 90        <span class="cm">관절 0을 90도로</span>
+!P 90 60 120 90 60   <span class="cm">다섯 관절 동시에</span>
+!GRIP 1        <span class="cm">집게 닫기 (0=열기)</span>
+!SPEED 5       <span class="cm">속도 1~10</span>
+!WAIT 1000     <span class="cm">대기 (한 번에 최대 5000)</span>
+!HOME          <span class="cm">홈 자세</span>
+!GET           <span class="cm">현재 각도 조회</span></code></pre>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h3>손 추적 중 키 조작</h3>
+      <p class="note">창을 클릭해 활성화한 뒤</p>
+      <ul class="keys">
+        <li><kbd>space</kbd><span>일시정지 / 재개 — 팔이 그 자세로 멈춥니다</span></li>
+        <li><kbd>h</kbd><span>홈 자세</span></li>
+        <li><kbd>i</kbd><span>좌우 방향 뒤집기</span></li>
+        <li><kbd>g</kbd><span>집게 제어 켜기 / 끄기</span></li>
+        <li><kbd>q</kbd><span>종료 (팔은 홈으로)</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>음성 중 조작</h3>
+      <p class="note">스페이스를 누르고 있는 동안만 듣습니다</p>
+      <ul class="keys">
+        <li><kbd>space</kbd><span>누르고 말하기 → 손을 떼면 끝</span></li>
+        <li><kbd>Enter</kbd><span>들린 문장 그대로 실행</span></li>
+        <li><kbd>e</kbd><span>글자로 고쳐서 실행</span></li>
+        <li><kbd>r</kbd> / <kbd>n</kbd><span>다시 말하기 / 버리기</span></li>
+        <li><kbd>go</kbd><span>이후 확인 없이 바로 실행 (<code>ask</code> 로 복귀)</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 점검 ══════════ -->
+<section id="check">
+  <h2>점검과 보정</h2>
+  <p class="lede">
+    무엇이 잘못됐는지 모를 때 추측하지 말고 이쪽부터 돌리세요. 이 도구들이 이 프로젝트의 진짜 줄거리입니다.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>실행</th><th>무엇을 재는가</th><th>옵션</th></tr></thead>
+      <tbody>
+        <tr><td><code>checkup.py</code></td>
+            <td><span class="desc">작업공간이 온전한지 — 기능별로 빠진 것과 그 영향</span></td>
+            <td><span class="desc"><code>--deep</code> 모듈 불러오기까지</span></td></tr>
+        <tr><td><code>vision_check.py</code></td>
+            <td><span class="desc">카메라와 색 범위</span></td>
+            <td><span class="desc"><code>--list</code> <code>--diag</code> <code>--probe</code></span></td></tr>
+        <tr><td><code>mp_check.py</code></td>
+            <td><span class="desc">mediapipe가 실제로 도는지 · 스마트 앱 제어 상태</span></td>
+            <td><span class="desc">—</span></td></tr>
+        <tr><td><code>voice_check.py</code></td>
+            <td><span class="desc">마이크 · GPU · 받아쓰기</span></td>
+            <td><span class="desc"><code>--stt</code> 받아쓰기까지 · <code>--mic</code></span></td></tr>
+        <tr><td><code>look_at.py 파란 물체</code></td>
+            <td><span class="desc">보고 각도만 계산 (팔은 안 움직임)</span></td>
+            <td><span class="desc">인자에 색 이름</span></td></tr>
+        <tr><td><code>colors.py</code></td>
+            <td><span class="desc">아는 색 목록과 HSV 범위</span></td>
+            <td><span class="desc">—</span></td></tr>
+        <tr><td><code>calibrate_point.py</code></td>
+            <td><span class="desc">가리키기 보정 — 화면 x ↔ 베이스 각도</span></td>
+            <td><span class="desc"><code>--fresh</code> 처음부터 · <code>--out</code></span></td></tr>
+        <tr><td><code>check_dataset.py</code></td>
+            <td><span class="desc">학습 데이터의 모순 · 부호 · 방향 · 시간</span></td>
+            <td><span class="desc">파일 이름을 인자로</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout" style="margin-top:16px">
+    <b>지금 가리키기 보정은 화면의 31%만 덮습니다</b> (x 378~576, 오른쪽).
+    그 밖에서는 직선을 늘여 추정하며, 그럴 때 <code>※ 보정 구간 밖이라 추정값입니다</code> 라고 알려줍니다.
+    <code>calibrate_point.py</code> 로 왼쪽과 가운데에 3~4점만 더 찍으면 화면 전체가 쓸 만해집니다.
+  </div>
+</section>
+
+<!-- ══════════ 정비 ══════════ -->
+<section id="env">
+  <h2>환경과 배포</h2>
+  <p class="lede">평소에는 쓸 일이 없고, 컴퓨터를 옮기거나 공개할 때 씁니다.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>실행</th><th>무엇을</th><th>옵션</th></tr></thead>
+      <tbody>
+        <tr><td><code>freeze_env.py</code></td>
+            <td><span class="desc">지금 컴퓨터의 패키지 판을 읽어 적기</span></td>
+            <td><span class="desc">원래 컴퓨터에서 한 번</span></td></tr>
+        <tr><td><code>setup_env.py</code></td>
+            <td><span class="desc">새 컴퓨터에 환경 세우기 (venv)</span></td>
+            <td><span class="desc"><code>--tier core</code> <code>--all</code> <code>--check</code> <code>--system-site</code></span></td></tr>
+        <tr><td><code>move_project.py</code></td>
+            <td><span class="desc">작업공간 옮기기 (복사 후 크기 대조)</span></td>
+            <td><span class="desc"><code>--dry-run</code> <code>--src</code> <code>--dst</code> <code>--with-checkpoints</code></span></td></tr>
+        <tr><td><code>publish_model.py</code></td>
+            <td><span class="desc">어댑터를 Hugging Face에 올리기</span></td>
+            <td><span class="desc"><code>--user</code> <code>--dry-run</code> <code>--card-only</code> <code>--verify</code></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ 시연 ══════════ -->
+<section id="demo">
+  <h2>시연 직전 점검</h2>
+  <div class="grid g3">
+    <div class="card">
+      <h3>닫아야 할 것</h3>
+      <ul class="keys">
+        <li><span>윈도우 <b>카메라</b> 앱 — 장치를 점유합니다</span></li>
+        <li><span>화상회의 프로그램</span></li>
+        <li><span>아두이노 IDE의 <b>시리얼 모니터</b> — COM 포트를 잡습니다</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>띄워야 할 것</h3>
+      <pre style="margin:0"><code>ollama serve
+ollama list   <span class="cm">llama3.1:8b 확인</span></code></pre>
+    </div>
+    <div class="card">
+      <h3>마지막 확인</h3>
+      <pre style="margin:0"><code>py -3.12 checkup.py --deep</code></pre>
+      <p class="note" style="margin:10px 0 0">
+        그리퍼 서보 선 고정 · 서보 외부 전원 · 팔 주변 20cm 비우기
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 막혔을 때 ══════════ -->
+<section id="trouble">
+  <h2>막혔을 때</h2>
+  <p class="lede">전부 우리가 실제로 겪은 것들입니다. 증상보다 <b>진짜 원인</b>이 엉뚱한 데 있는 경우가 많았습니다.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>창에 뜨는 말</th><th>진짜 원인</th><th>할 일</th></tr></thead>
+      <tbody>
+        <tr><td><code>&#39;py&#39; 용어가 ... 인식되지 않습니다</code></td>
+            <td><span class="desc">파이썬이 없거나 PATH에 없음</span></td>
+            <td><span class="desc"><code>python -V</code> 로 확인 · python.org에서 재설치 시 <b>Add to PATH</b> 체크</span></td></tr>
+        <tr><td><code>No module named &#39;torch&#39;</code></td>
+            <td><span class="desc"><code>python</code> 이 3.14로 감</span></td>
+            <td><span class="desc"><code>py -3.12</code> 로 실행</span></td></tr>
+        <tr><td><code>could not open port &#39;COM4&#39;</code></td>
+            <td><span class="desc">다른 창이 포트를 잡고 있음</span></td>
+            <td><span class="desc">아두이노 IDE 시리얼 모니터 · 다른 파이썬 창 닫기</span></td></tr>
+        <tr><td><code>404 ... /api/chat</code></td>
+            <td><span class="desc">Ollama가 안 떠 있음</span></td>
+            <td><span class="desc">첫 번째 창에서 <code>ollama serve</code></span></td></tr>
+        <tr><td><span class="desc">카메라를 열 수 없습니다</span></td>
+            <td><span class="desc">윈도우 카메라 앱이 점유 중</span></td>
+            <td><span class="desc">앱을 닫고 <code>vision_check.py --diag</code></span></td></tr>
+        <tr><td><code>WinError 4551</code></td>
+            <td><span class="desc">스마트 앱 제어가 서명 없는 DLL을 막음</span></td>
+            <td><span class="desc">Windows 보안 → 앱 및 브라우저 컨트롤 → 스마트 앱 제어 끄기</span></td></tr>
+        <tr><td><span class="desc">스크립트를 실행할 수 없으므로 ...</span></td>
+            <td><span class="desc">PowerShell 실행 정책 (<code>.ps1</code> 파일)</span></td>
+            <td><span class="desc"><code>powershell -ExecutionPolicy Bypass -File .\파일.ps1</code></span></td></tr>
+        <tr><td><span class="desc">팔이 아무 반응이 없음</span></td>
+            <td><span class="desc">서보 전원 · 선 빠짐</span></td>
+            <td><span class="desc"><code>stop</code> → 외부 전원 확인 → <code>test_arm.py</code></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  코드와 작업 기록 · <a href="https://github.com/azureiraraavis-png/llama-robot-arm">github.com/azureiraraavis-png/llama-robot-arm</a><br>
+  학습된 어댑터 · <a href="https://huggingface.co/azureiraraavis/Llama-3.1-8B-arm-lora">huggingface.co/azureiraraavis/Llama-3.1-8B-arm-lora</a>
+</footer>
+
+</div>
