@@ -27,6 +27,7 @@ Adeept 5-DOF Robotic Arm Kit (Arduino UNO) · Llama 3.1 8B (Ollama + QLoRA) · R
 "집게를 10번 딱딱거리시오"
 "인사하고 나서, 30초 동안 로봇춤을 추시오"
 "그 상태로 기다리세요"            ← 시간을 안 말하면 홈으로 안 돌아감
+"파란 물체 쪽을 봐"               ← 카메라로 찾아 그쪽으로 돈다. 못 보면 안 움직임
 ```
 
 세 가지 입구가 있고, 그 뒤는 전부 같은 길입니다.
@@ -34,7 +35,8 @@ Adeept 5-DOF Robotic Arm Kit (Arduino UNO) · Llama 3.1 8B (Ollama + QLoRA) · R
 ```
 자연어 입력 ─┐
 손 추적    ─┼→ 검증·보정 ─→ 시리얼 ─→ 아두이노 (각도 한계 강제)
-음성 인식  ─┘
+음성 인식  ─┘        ↑
+              카메라 (look_at — 위치를 재는 것은 코드가)
 ```
 
 ## 설계 원칙 — 이것이 거의 모든 문제를 풀었다
@@ -70,7 +72,11 @@ py -3.12 llm_arm_bridge.py --port COM4    # 자연어 (Ollama)
 py -3.12 arm_tuned.py                     # 자연어 (직접 구운 모델)
 py -3.12 hand_track.py --dry-run          # 손 추적 (먼저 팔 없이)
 py -3.12 voice_arm.py                     # 음성
+py -3.12 look_at.py 파란 물체              # 보고 각도만 계산 (팔 없이)
 ```
+
+다른 컴퓨터에 옮길 때는 [`ENVIRONMENT.md`](ENVIRONMENT.md) 를 보세요.
+`freeze_env.py` → `setup_env.py` → `checkup.py --deep` 순서입니다.
 
 ## 프로그램
 
@@ -80,16 +86,25 @@ py -3.12 voice_arm.py                     # 음성
 | 학습된 모델로 조종 | `arm_tuned.py`, `arm_common.py`, `evaluate.py` |
 | 춤 (안무 8종, 박자↔속도 역산) | `dance.py` |
 | 카메라로 물체 보고 가리키기 | `vision.py`, `calibrate_point.py`, `point_at.py` |
+| **"파란 물체 쪽을 봐"** (시각 + 언어) | `colors.py`, `look_at.py` |
 | 손 추적 (MediaPipe → 5축) | `hand_map.py`, `hand_track.py` |
 | 음성 (winmm 녹음 + Whisper) | `voice_io.py`, `stt.py`, `voice_arm.py` |
 | 데이터 검사·정제 | `check_dataset.py`, `fix_dataset_v2.py` |
+| 집기 보정 (하드웨어 한계로 보류) | `calibrate_arm.py` |
+| **모델끼리 겨루기** | `compare_models.py` |
+| 환경 고정·설치 | `freeze_env.py`, `setup_env.py` |
 | 작업공간 이사·점검 | `move_project.py`, `checkup.py` |
+| 모델 공개 | `publish_model.py` |
 
 **진단 도구가 이 저장소의 진짜 줄거리입니다.** 고비마다 답은 같았습니다 —
 추측을 멈추고 재는 도구를 만드는 것.
 
 `pin_finder.ino`(배선) · `check_dataset.py`(데이터) · `vision_check.py --diag`(카메라) ·
-`mp_check.py`(mediapipe) · `voice_check.py`(마이크·GPU) · `checkup.py`(작업공간)
+`mp_check.py`(mediapipe) · `voice_check.py`(마이크·GPU) · `checkup.py`(작업공간) ·
+`compare_models.py`(모델 비교)
+
+**그리고 그 도구들이 일곱 번 틀렸습니다.** 매번 대상이 아니라 자[尺]가 문제였습니다.
+자세한 것은 작업 기록에 있습니다.
 
 ## 알려진 함정
 
@@ -107,17 +122,20 @@ py -3.12 voice_arm.py                     # 음성
 
 ## 기록
 
-**[`대장정_기록.md`](대장정_기록.md)** — 조립부터 음성까지 12장의 작업 기록.
+**[`대장정_기록.md`](대장정_기록.md)** — 조립부터 모델 비교까지 16장의 작업 기록.
 잘 된 것보다 **틀린 것과 그걸 어떻게 알아냈는지**가 중심입니다.
 
-보조 문서: [`가리키기_순서.md`](가리키기_순서.md) (카메라 보정 단계별 순서)
+보조 문서
+- [`가리키기_순서.md`](가리키기_순서.md) — 카메라 보정 단계별 순서
+- [`ENVIRONMENT.md`](ENVIRONMENT.md) — 다른 컴퓨터로 옮기기 (그리고 왜 Docker도 exe도 아닌가)
+- [`presentation/`](presentation/) — 발표 자료, 대본, 시연 운영 문서, 예상 질문
 
 ## 학습된 모델
 
 QLoRA 어댑터 (rank 16, 41.9M 학습 파라미터 / 8.07B, 데이터 98건)는 용량 때문에
 저장소에 넣지 않았습니다. Hugging Face Hub에 별도로 올려 두었습니다.
 
-> **모델:** *https://huggingface.co/azureiraraavis/Llama-3.1-8B-arm-lora*
+> **모델:** https://huggingface.co/azureiraraavis/Llama-3.1-8B-arm-lora
 
 **Built with Llama** — 이 어댑터는 Meta Llama 3.1 8B Instruct를 파인튜닝한 파생물이며,
 [Llama 3.1 Community License](https://www.llama.com/llama3_1/license/)를 따릅니다.
@@ -141,5 +159,5 @@ QLoRA 어댑터 (rank 16, 41.9M 학습 파라미터 / 8.07B, 데이터 98건)는
 
 ## 라이선스
 
-코드와 문서: MIT (`LICENSE` 참조 — 이름을 본인 것으로 바꾸세요)
+코드와 문서: MIT (`LICENSE` 참조)
 학습된 어댑터: Llama 3.1 Community License

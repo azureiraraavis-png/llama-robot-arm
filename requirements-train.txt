@@ -1,0 +1,8 @@
+# train — 모델 재학습 (평소에는 필요 없음)
+# 이 컴퓨터에서 실제로 읽어 적은 값입니다 (freeze_env.py)
+
+peft==0.20.0
+datasets==5.0.1
+bitsandbytes==0.50.1
+# trl  (이 컴퓨터에 없음 — 없어도 됩니다)
+accelerate==1.14.0

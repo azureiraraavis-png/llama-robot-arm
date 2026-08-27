@@ -13,6 +13,7 @@ Hugging Face는 모델을 두라고 만든 곳이라 큰 파일 처리가 이미
   py -3.12 publish_model.py --user 내아이디
   py -3.12 publish_model.py --user 내아이디 --dry-run    무엇이 올라갈지만 보기
   py -3.12 publish_model.py --user 내아이디 --card-only  모델 카드만 다시 올리기
+  py -3.12 publish_model.py --user 내아이디 --verify     올린 것이 제대로 있는지 확인
 
 이름이 Llama 로 시작하는 것은 취향이 아니라 라이선스 요구사항입니다.
   Llama 3.1 Community License 1.b — 파생 모델 이름은 "Llama"로 시작해야 합니다.
@@ -111,6 +112,71 @@ def ensure_login(token=None):
     return who
 
 
+def verify(repo_id, folder):
+    """올린 것이 실제로 그쪽에 있는지 확인합니다. 눈으로 보는 것보다 확실합니다."""
+    from huggingface_hub import HfApi, hf_hub_download
+
+    url = f"https://huggingface.co/{repo_id}"
+    print(f"\n확인합니다: {url}\n")
+    try:
+        remote = set(HfApi().list_repo_files(repo_id))
+    except Exception as e:
+        print(f"  ✘ 저장소를 읽지 못했습니다 — {type(e).__name__}: {e}")
+        print("    주소(아이디·이름)가 맞는지, 비공개라면 로그인했는지 확인하세요.")
+        return 1
+
+    bad = 0
+
+    # 1. 있어야 할 파일이 다 있는가
+    if folder:
+        send, _skip = survey(folder)
+        missing = [f for f, _n in send if f.replace("\\", "/") not in remote]
+        if missing:
+            bad += 1
+            print(f"  ✘ 빠진 파일 {len(missing)}개: {', '.join(missing[:4])}")
+        else:
+            print(f"  ✔ 어댑터 파일 {len(send)}개 전부 올라가 있습니다")
+
+    # 2. 안 올라갔어야 할 것이 올라갔는가
+    ckpt = [f for f in remote if f.replace("\\", "/").startswith("checkpoint-")]
+    if ckpt:
+        bad += 1
+        print(f"  ✘ 학습 중간 저장본이 올라갔습니다 ({len(ckpt)}개) — 지우는 게 좋습니다")
+    else:
+        print("  ✔ 학습 중간 저장본은 올라가지 않았습니다")
+
+    # 3. 모델 카드가 제구실을 하는가
+    if "README.md" not in remote:
+        print("  ✘ README.md(모델 카드)가 없습니다")
+        return 1
+    try:
+        text = open(hf_hub_download(repo_id, "README.md"), encoding="utf-8").read()
+    except Exception as e:
+        print(f"  ✘ 모델 카드를 읽지 못했습니다 — {e}")
+        return 1
+
+    for ok, label, hint in (
+        ("Built with Llama" in text, "'Built with Llama' 표시",
+         "라이선스가 요구하는 문구입니다"),
+        ("llama.com/llama3_1/license" in text, "라이선스 링크", ""),
+        ("여기에 GitHub 주소를 넣으세요" not in text, "GitHub 링크가 채워짐",
+         "--card-only 로 카드를 다시 올리세요"),
+        ("github.com" in text, "GitHub 주소가 들어 있음", ""),
+    ):
+        if ok:
+            print(f"  ✔ {label}")
+        else:
+            bad += 1
+            print(f"  ✘ {label}" + (f" — {hint}" if hint else ""))
+
+    print()
+    if bad:
+        print(f"  {bad}가지가 아직입니다.\n")
+        return 1
+    print(f"  전부 제자리입니다. → {url}\n")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="어댑터를 Hugging Face에 올립니다")
     ap.add_argument("--user", required=True, help="Hugging Face 아이디")
@@ -119,6 +185,8 @@ def main():
     ap.add_argument("--private", action="store_true", help="비공개로 만들기")
     ap.add_argument("--dry-run", action="store_true", help="무엇이 올라갈지만 보기")
     ap.add_argument("--card-only", action="store_true", help="모델 카드만 다시 올리기")
+    ap.add_argument("--verify", action="store_true",
+                    help="올린 것이 실제로 그쪽에 있는지 확인만 하기")
     ap.add_argument("--token", default=None,
                     help="Hugging Face 토큰 (생략하면 필요할 때 물어봅니다)")
     args = ap.parse_args()
@@ -132,6 +200,15 @@ def main():
     url = f"https://huggingface.co/{repo_id}"
 
     folder = find_adapter(args.folder)
+
+    if args.verify:
+        try:
+            import huggingface_hub  # noqa: F401
+        except ImportError:
+            print("⚠ huggingface_hub 가 없습니다:  py -3.12 -m pip install huggingface_hub")
+            return 1
+        return verify(repo_id, folder)
+
     if folder is None and not args.card_only:
         print("⚠ adapter_config.json 이 있는 폴더를 찾지 못했습니다.")
         print("  작업공간 폴더에서 실행하고 있는지 확인하세요. (--folder 로 지정도 가능)")
@@ -197,7 +274,9 @@ def main():
     print(f"     →  https://github.com/<GitHub아이디>/llama-robot-arm")
     print(f"  3. git commit & push")
     print(f"  4. py -3.12 publish_model.py --user {args.user} --card-only")
-    print("     ← 카드를 고쳤으니 한 번 더 올려야 Hugging Face 쪽에도 반영됩니다\n")
+    print("     ← 카드를 고쳤으니 한 번 더 올려야 Hugging Face 쪽에도 반영됩니다")
+    print(f"  5. py -3.12 publish_model.py --user {args.user} --verify")
+    print("     ← 전부 제자리인지 확인\n")
     return 0
 
 

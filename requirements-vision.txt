@@ -1,0 +1,6 @@
+# vision — 카메라 · 가리키기 · 손 추적
+# 이 컴퓨터에서 실제로 읽어 적은 값입니다 (freeze_env.py)
+
+opencv-python==5.0.0.93
+mediapipe==0.10.21
+numpy==1.26.4

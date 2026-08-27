@@ -1,0 +1,5 @@
+# core — 팔 조종 — 자연어 · 춤 · 아두이노 통신
+# 이 컴퓨터에서 실제로 읽어 적은 값입니다 (freeze_env.py)
+
+pyserial==3.5
+requests==2.34.2

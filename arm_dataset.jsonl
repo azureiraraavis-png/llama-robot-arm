@@ -155,3 +155,22 @@
 {"instruction": "원상복구하시오", "output": {"commands": [{"cmd": "home"}]}}
 {"instruction": "10초 동안 춤을 추시오", "output": {"commands": [{"cmd": "repeat", "seconds": 10, "commands": [{"cmd": "dance", "routine": "all"}]}, {"cmd": "home"}]}}
 {"instruction": "모든 관절을 45도씩 움직이시오", "output": {"commands": [{"cmd": "move", "joint": 1, "delta": -45}, {"cmd": "move", "joint": 2, "delta": -45}, {"cmd": "move", "joint": 3, "delta": -45}]}}
+{"instruction": "천천히 앞으로 숙여서 인사하시오", "output": {"commands": [{"cmd": "speed", "level": 2}, {"cmd": "joint", "joint": 1, "angle": 50}, {"cmd": "wait", "ms": 800}, {"cmd": "joint", "joint": 1, "angle": 90}, {"cmd": "speed", "level": 5}, {"cmd": "home"}]}}
+{"instruction": "집게를 여시오", "output": {"commands": [{"cmd": "grip", "close": false}]}}
+{"instruction": "집게를 닫으시오", "output": {"commands": [{"cmd": "grip", "close": true}]}}
+{"instruction": "고개를 도리도리 흔드시오", "output": {"commands": [{"cmd": "joint", "joint": 3, "angle": 50}, {"cmd": "joint", "joint": 3, "angle": 130}, {"cmd": "joint", "joint": 3, "angle": 50}, {"cmd": "joint", "joint": 3, "angle": 90}, {"cmd": "home"}]}}
+{"instruction": "작은 물체를 잡는 시늉을 하시오", "output": {"commands": [{"cmd": "grip", "close": false}, {"cmd": "joint", "joint": 1, "angle": 55}, {"cmd": "joint", "joint": 2, "angle": 125}, {"cmd": "grip", "close": true}, {"cmd": "wait", "ms": 800}, {"cmd": "joint", "joint": 1, "angle": 90}, {"cmd": "joint", "joint": 2, "angle": 90}, {"cmd": "grip", "close": false}, {"cmd": "home"}]}}
+{"instruction": "집게를 세 번 딱딱거리시오", "output": {"commands": [{"cmd": "repeat", "times": 3, "commands": [{"cmd": "grip", "close": true}, {"cmd": "grip", "close": false}]}, {"cmd": "home"}]}}
+{"instruction": "집게를 닫았다 여는 것을 10번 반복하시오", "output": {"commands": [{"cmd": "repeat", "times": 10, "commands": [{"cmd": "grip", "close": true}, {"cmd": "grip", "close": false}]}, {"cmd": "home"}]}}
+{"instruction": "5초 동안 집게를 딱딱거리시오", "output": {"commands": [{"cmd": "repeat", "seconds": 5, "commands": [{"cmd": "grip", "close": true}, {"cmd": "grip", "close": false}]}, {"cmd": "home"}]}}
+{"instruction": "팔을 10도 앞으로 기울이시오", "output": {"commands": [{"cmd": "move", "joint": 1, "delta": -10}]}}
+{"instruction": "원상복구하시오", "output": {"commands": [{"cmd": "home"}]}}
+{"instruction": "팔을 20도 뒤로 기울인 뒤, 그 자세로 10초 기다리시오", "output": {"commands": [{"cmd": "move", "joint": 1, "delta": 20}, {"cmd": "wait", "seconds": 10}, {"cmd": "home"}]}}
+{"instruction": "모든 관절을 -15도씩 굽히고, 그대로 유지하시오", "output": {"commands": [{"cmd": "move", "joint": 1, "delta": -15}, {"cmd": "move", "joint": 2, "delta": -15}, {"cmd": "move", "joint": 3, "delta": -15}]}}
+{"instruction": "원상복구 하시오", "output": {"commands": [{"cmd": "home"}]}}
+{"instruction": "30초 동안 웨이브를 하시오", "output": {"commands": [{"cmd": "repeat", "seconds": 30, "commands": [{"cmd": "dance", "routine": "wave"}]}, {"cmd": "home"}]}}
+{"instruction": "파란 물체를 보시오", "output": {"commands": [{"cmd": "look_at", "target": "파란"}]}}
+{"instruction": "원상복구하시오", "output": {"commands": [{"cmd": "home"}]}}
+{"instruction": "파란 물체를 보시오", "output": {"commands": [{"cmd": "look_at", "target": "파란"}]}}
+{"instruction": "원상복구하시오", "output": {"commands": [{"cmd": "home"}]}}
+{"instruction": "8초 동안 도리도리 하시오", "output": {"commands": [{"cmd": "repeat", "seconds": 8, "commands": [{"cmd": "joint", "joint": 3, "angle": 50}, {"cmd": "joint", "joint": 3, "angle": 130}]}, {"cmd": "joint", "joint": 3, "angle": 90}, {"cmd": "home"}]}}
